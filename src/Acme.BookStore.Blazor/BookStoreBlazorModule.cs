@@ -44,6 +44,8 @@ using Volo.Abp.VirtualFileSystem;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Packages.FontAwesome;
 using Volo.Abp.AspNetCore.Components.Server.Theming.Bundling;
+using Volo.Abp.AspNetCore.Mvc.UI.Components.LayoutHook;
+using Acme.BookStore.Blazor.Pages.Components.FontAwesome;
 
 namespace Acme.BookStore.Blazor;
 
@@ -75,6 +77,15 @@ public class BookStoreBlazorModule : AbpModule
                 typeof(BookStoreApplicationModule).Assembly,
                 typeof(BookStoreApplicationContractsModule).Assembly,
                 typeof(BookStoreBlazorModule).Assembly
+            );
+        });
+
+        // For MVC UI
+        Configure<AbpLayoutHookOptions>(options =>
+        {
+            options.Add(
+                LayoutHooks.Head.Last, //The hook name
+                typeof(FontAwesomeViewComponent) //The component to add
             );
         });
     }
@@ -119,6 +130,14 @@ public class BookStoreBlazorModule : AbpModule
                 }
             );
 
+            options.StyleBundles.Configure(
+                StandardBundles.Styles.Global,
+                bundle =>
+                {
+                    bundle.Contributors.Remove<FontAwesomeStyleContributor>();
+                }
+            );
+
             //BLAZOR UI
             options.StyleBundles.Configure(
                 BlazorBasicThemeBundles.Styles.Global,
@@ -127,6 +146,14 @@ public class BookStoreBlazorModule : AbpModule
                     bundle.AddFiles("/blazor-global-styles.css");
                     //You can remove the following line if you don't use Blazor CSS isolation for components
                     bundle.AddFiles("/Acme.BookStore.Blazor.styles.css");
+                }
+            );
+
+            options.StyleBundles.Configure(
+                BlazorStandardBundles.Styles.Global,
+                bundle =>
+                {
+                    bundle.Contributors.Remove<FontAwesomeStyleContributor>();
                 }
             );
         });
